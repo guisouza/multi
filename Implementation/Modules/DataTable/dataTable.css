@@ -1,0 +1,8 @@
+.dataTable{
+  width: 100px;
+  height: 100px;
+  background: #CCC;
+  padding: 40px;
+  display: inline-flex;
+  margin: 10px;
+}
