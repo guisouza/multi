@@ -4,17 +4,13 @@ var SandBox = (function(){
     this.constructor.apply(this,arguments)
   }
 
-  Sandbox.prototype.constructor = function(ApplicationCore){
-    this.core = ApplicationCore;
-    this.get = this.core.get
+  Sandbox.prototype.constructor = function(core){
     this.events = {}
+    this.core = core;
   }
 
-  Sandbox.prototype.notify = function(label,data){
-    if (this.events[label])
-    this.events[label].forEach(function(action){
-      action(data);
-    })
+  Sandbox.prototype.requestLayout = function(url,callback){
+    this.core.get(url,callback);
   }
 
   Sandbox.prototype.on = function(label,action){
@@ -22,6 +18,17 @@ var SandBox = (function(){
       this.events[label] = [];
 
     this.events[label].push(action);
+  }
+
+  Sandbox.prototype.notify = function notify(label,data){
+    var event = new Event(data)
+    if (this.events[label])
+    this.events[label].forEach(function(action){
+      if (event.shouldExecute()){
+          action(event);
+      }
+
+    })
   }
 
   return Sandbox

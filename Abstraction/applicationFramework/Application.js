@@ -6,7 +6,8 @@ var publicSandbox = new Sandbox(platform)
     return this.constructor.apply(this,arguments)
   }
 
-  Application.prototype.constructor = function(applicationDefinition){
+  Application.prototype.constructor = function(applicationTitle,applicationDefinition){
+
     var definition = applicationDefinition(publicSandbox)
     function newApplication(){
       this.constructor.apply(this,arguments);
@@ -21,6 +22,8 @@ var publicSandbox = new Sandbox(platform)
       this.init();
     }
 
+    newApplication.prototype.title = applicationTitle;
+
     newApplication.prototype.define = function(definition){
       for (method in definition){
         if (definition[method].bind){
@@ -32,15 +35,23 @@ var publicSandbox = new Sandbox(platform)
     }
 
     newApplication.prototype.register = function(module){
-      if(module.attachSandbox)
-        module.attachSandbox(this.sandbox)
+      module = new module(this.sandbox)
       this.modules.push(module);
     }
 
     newApplication.prototype.startAll = function(){
       this.modules.forEach(function(module){
-        module.load(this.element)
-        module.init.call(module.prototype);
+        module.load(this.element,function(module){
+            if (module.init)
+              module.init.bind(module)();
+        })
+      }.bind(this))
+    }
+
+    newApplication.prototype.destroy = function(){
+      this.modules.forEach(function(module){
+        module.unload();
+        module.destroy;
       }.bind(this))
     }
 
@@ -48,7 +59,7 @@ var publicSandbox = new Sandbox(platform)
       var element = document.createElement('div');
       element.innerHTML = this.template
       element = element.children[0]
-      this.element.appendChild (element);
+      this.element.appendChild(element);
       this.element = element
     }
 

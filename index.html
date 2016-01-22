@@ -4,28 +4,51 @@
     <meta charset="utf-8">
     <title></title>
     <style media="screen">
+      .display{
+        width: 200px;
+        height: 40px;
+        font-size: 20px;
+        background: green;
+        color: white;
+      }
       .application{
         display: flex;
         border: 1px solid black;
         margin: 10px;
+        width: 400px;
+        float: left;
+      }
+
+      .applications li{
+        display: inline-block;
+        background: #ECECEC;
+        padding: 20px;
+        margin: 5px;
       }
     </style>
-    <link rel="stylesheet" href="reset.css" media="screen" charset="utf-8">
     <link rel="stylesheet" href="Implementation/Modules/DataTable/DataTable.css" media="screen" charset="utf-8">
     <link rel="stylesheet" href="Implementation/Modules/Form/Form.css" media="screen" charset="utf-8">
   </head>
   <body>
+    <ul class="applications">
 
+    </ul>
+    <script type="text/javascript" src="Abstraction/commom/Event.js"></script>
+    <script type="text/javascript" src="Abstraction/commom/Sandbox.js"></script>
+    <script type="text/javascript" src="Abstraction/applicationFramework/Application.js"></script>
+    <script type="text/javascript" src="Abstraction/applicationFramework/Module.js"></script>
+    <script type="text/javascript" src="Abstraction/platformFramework/Platform.js"></script>
 
-
-
-
-    <script type="text/javascript" src="Abstraction/commom/sandbox.js"></script>
-    <script type="text/javascript" src="Abstraction/applicationFramework/applicationCore.js"></script>
-    <script type="text/javascript" src="Abstraction/applicationFramework/module.js"></script>
 
     <script type="text/javascript" src="Implementation/Modules/DataTable/dataTable.js"></script>
     <script type="text/javascript" src="Implementation/Modules/Form/Form.js"></script>
+    <script type="text/javascript" src="Implementation/Modules/Keyboard/Keyboard.js"></script>
+    <script type="text/javascript" src="Implementation/Modules/Display/Display.js"></script>
+
+    <script type="text/javascript" src="Implementation/Applications/UsersTable/UsersTable.js"></script>
+    <script type="text/javascript" src="Implementation/Applications/Broadcast/Broadcast.js"></script>
+    <script type="text/javascript" src="Implementation/Applications/Calculator/Calculator.js"></script>
+
     <script type="text/javascript" src="app.js"></script>
   </body>
 </html>
