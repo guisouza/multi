@@ -1,80 +1,112 @@
-var platform = {}
+/*  global Application */
+/*  global Sandbox */
+/*  global Sandbox */
+/*  global setInterval */
+/*  global XMLHttpRequest */
+/*  global Template */
 
-var publicSandbox = new Sandbox(platform)
+class Application {
+    constructor(applicationTitle, applicationDefinition) {
+      const definition = applicationDefinition;
 
-  Application = function(){
-    return this.constructor.apply(this,arguments)
-  }
+      class newApplication {
 
-  Application.prototype.constructor = function(applicationTitle,applicationDefinition){
-
-    var definition = applicationDefinition(publicSandbox)
-    function newApplication(){
-      this.constructor.apply(this,arguments);
-    }
-
-    newApplication.prototype.constructor = function(HTMLElement){
-      this.element = HTMLElement;
-      this.sandbox = new Sandbox(this);
-      this.modules = [];
-      this.define(definition);
-      this.load();
-      this.init();
-    }
-
-    newApplication.prototype.title = applicationTitle;
-
-    newApplication.prototype.define = function(definition){
-      for (method in definition){
-        if (definition[method].bind){
-          this[method] = definition[method].bind(this);
-        }else{
-          this[method] = definition[method];
+        constructor(sandbox) {
+          this.sandbox = new Sandbox(this);
+          this.modules = [];
+          this.define(definition(sandbox));
         }
+
+        define(interfaceDefinition) {
+          for (const method in interfaceDefinition) {
+            if (interfaceDefinition[method].bind) {
+              this[method] = interfaceDefinition[method].bind(this);
+            }else {
+              this[method] = interfaceDefinition[method];
+            }
+          }
+        }
+
+        register(module) {
+          module = new module(this.sandbox);
+
+          this.sandbox.on('DOWN', function applicationDownHandler() {
+            if (this.template.element.className.indexOf('down') === -1) {
+              this.template.element.className = `${this.template.element.className} down`;
+            }
+          }.bind(this));
+
+          this.checkTimer = setInterval(function checkTrimer() {
+            let allOk = true;
+
+            this.modules.forEach(function moduleIterator(currentModule) {
+              if (currentModule.hasOwnProperty('alive')) {
+                if (currentModule.alive === false) {
+                  allOk = false;
+                }
+              }
+            });
+
+            if (allOk) {
+              this.template.element.className = this.template.element.className.replace('down', '');
+            }
+          }.bind(this), 1000);
+
+          this.modules.push(module);
+          return module;
+        }
+
+        startAll() {
+          this.modules.forEach(this.startModule.bind(this));
+        }
+
+        startModule(module) {
+          module.load(this.template.element, (currentModule) => {
+            if (currentModule.init) {
+              currentModule.init.bind(currentModule)();
+            }
+          });
+        }
+
+        destroy() {
+          // this.modules.forEach(function(module){
+            // module.unload();
+            // module.destroy;
+          // }.bind(this))
+        }
+
+        load(HTMLElement) {
+          this.element = HTMLElement;
+          if (this.template) {
+            this.processLayout();
+            this.init();
+          }else {
+            this.sandbox.requestLayout(this.templateUrl, function requestLayout(template) {
+              this.template = template;
+              this.processLayout();
+              this.init();
+            }.bind(this));
+          }
+        }
+
+        processLayout() {
+          this.template = new Template(this.element, this.template, this);
+        }
+
+        get(path, callback) {
+          const oReq = new XMLHttpRequest();
+          oReq.addEventListener('load', function layoutRequestCallback() {
+            callback(this.responseText);
+          });
+          oReq.open('GET', path);
+          oReq.send();
+        }
+
       }
-    }
 
-    newApplication.prototype.register = function(module){
-      module = new module(this.sandbox)
-      this.modules.push(module);
-    }
+      newApplication.prototype.title = applicationTitle;
 
-    newApplication.prototype.startAll = function(){
-      this.modules.forEach(function(module){
-        module.load(this.element,function(module){
-            if (module.init)
-              module.init.bind(module)();
-        })
-      }.bind(this))
-    }
-
-    newApplication.prototype.destroy = function(){
-      this.modules.forEach(function(module){
-        module.unload();
-        module.destroy;
-      }.bind(this))
-    }
-
-    newApplication.prototype.load = function(callback){
-      var element = document.createElement('div');
-      element.innerHTML = this.template
-      element = element.children[0]
-      this.element.appendChild(element);
-      this.element = element
-    }
-
-
-    newApplication.prototype.get = function(path,callback){
-
-      var oReq = new XMLHttpRequest();
-      oReq.addEventListener("load", function(){
-        callback(this.responseText)
-      });
-      oReq.open("GET", path);
-      oReq.send();
+      return newApplication;
 
     }
-
-    return newApplication
-
   }

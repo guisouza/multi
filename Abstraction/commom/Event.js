@@ -1,20 +1,14 @@
-var Event = (function(){
-  function Event(){
-    this.constructor.apply(this, arguments);
-  }
-
-  Event.prototype.constructor = function(data){
+class Event {
+  constructor(data) {
     this.data = data;
     this.stopped = false;
   }
 
-  Event.prototype.stopPropagation = function(){
+  stopPropagation() {
     this.stopped = true;
   }
 
-  Event.prototype.shouldExecute = function(){
+  shouldExecute() {
     return !this.stopped;
   }
-
-  return Event;
-})()
+}

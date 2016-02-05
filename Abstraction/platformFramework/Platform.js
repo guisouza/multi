@@ -1,28 +1,38 @@
-var Platform = (function(){
+/* global document */
+/* global Sandbox */
 
-  function Platform(){
-    this.constructor.apply(this,arguments);
-  }
+class Platform {
 
-  Platform.prototype.constructor = function(rootElement){
-    this.element = document.querySelector('.applications')
+  constructor(rootElement) {
+    this.element = document.querySelector('.applications');
+    this.sandbox = new Sandbox(this);
+    this.publicSandbox = new Sandbox(this);
     this.applications = [];
     this.instances = [];
-    this.root = rootElement
+    this.root = rootElement;
   }
 
-  Platform.prototype.register = function(application){
+  register(application) {
+    const child = document.createElement('li');
     this.applications.push(application);
-    var child = document.createElement('li');
-    child.addEventListener('click',this.init.bind(this,application))
+    child.addEventListener('click', this.initApplication.bind(this, application, this.publicSandbox));
     child.innerHTML = application.prototype.title;
-    this.element.appendChild(child)
+    this.element.appendChild(child);
   }
 
-  Platform.prototype.init = function(application){
-      this.instances.push(new application(this.root))
+  registerCoreApplication(application) {
+    const child = document.createElement('li');
+    this.applications.push(application);
+    child.addEventListener('click', this.initApplication.bind(this, application, this.sandbox));
+    child.innerHTML = application.prototype.title;
+    this.element.appendChild(child);
   }
 
-  return Platform
+  initApplication(application) {
+    const applicationInstance = new application(this.sandbox);
+    applicationInstance.load(this.root);
+    this.sandbox.notify('application:init', applicationInstance);
+    this.instances.push(applicationInstance);
+  }
 
-})()
+}

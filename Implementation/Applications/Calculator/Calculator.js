@@ -1,46 +1,37 @@
+/*  global Application*/
+/*  global Keyboard*/
+/*  global Display*/
 
-var Calculator = new Application('Calculator',function(publicSandbox){
+const Calculator = new Application('Calculator', function calculatorConstructor() {
   return {
-    init : function(){
-      this.register(Display);
-      this.register(Keyboard);
-      this.startAll();
+    init: function init() {
       this.value = 0;
 
-      this.sandbox.on('buttonPressed:number',function(event){
-        var value = event.data;
-        if (this.value === 0){
-            this.value = value
-        }else{
-            this.value = (this.value*10) + value
-        }
-        this.sandbox.notify('outputText',this.value)
+      this.register(Keyboard);
+      this.register(Display);
+      this.startAll();
 
-      }.bind(this))
-
-
-      this.sandbox.on('buttonPressed:operation',function(event){
-        var value = event.data
-        this.sandbox.notify('outputText','')
-        if (value !== '='){
-          this.auxiliarValue = this.value;
-          this.value = 0;
-          this.currentOperation = value
-        }
-
-        if (value === '='){
-          this.value = this.eval()
-        }
-
-      }.bind(this))
-
-
+      this.sandbox.on('buttonPressed:number', this.numberHandler.bind(this));
+      this.sandbox.on('buttonPressed:operation', this.operationHandler.bind(this));
     },
-    eval :function(){
-      var result = eval(this.auxiliarValue+this.currentOperation+this.value);
-      this.sandbox.notify('outputText',result);
-      return result;
+
+    numberHandler: function numberHandler(event) {
+      this.value = (this.value * 10) + event.data;
+      return this.sandbox.notify('outputText', this.value);
     },
-    template : '<div class="application"></div>'
-  }
+
+    operationHandler: function operationHandler(event) {
+      if (event.data !== '=') {
+        this.auxiliarValue = this.value;
+        this.value = 0;
+        this.currentOperation = event.data;
+        return this.sandbox.notify('outputText', '');
+      }
+
+      this.value = this.eval();
+      return this.sandbox.notify('outputText', this.value);
+    },
+
+    eval: () => eval(this.auxiliarValue + this.currentOperation + this.value),
+    template: '<div class="application"></div>'};
 });

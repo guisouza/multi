@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+
+  <body>
+    <ul>
+
+    </ul>
+  </body>
+
+  <script type="text/javascript">
+
+  function HTML(){
+    var ul = document.querySelector('ul')
+    var x = 0
+
+
+    var y = ''
+    while(x < 100000){
+      y+= '<li>teste</li>'
+      x++
+
+    }
+
+    ul.innerHTML = y;
+
+    // while(x < 100000){
+    //   var el = document.createElement('li');
+    //   el.textContent = 'teste';
+    //   ul.appendChild(el);
+    //   x++
+    // }
+
+  }
+
+  document.addEventListener('DOMContentLoaded',HTML)
+
+
+
+
+
+  </script>
+
+
+</html>
